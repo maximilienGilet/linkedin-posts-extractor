@@ -57,7 +57,7 @@ function extractPosts() {
       );
 
       // ignore posts with no text or small text
-      if (textContent.length < 20) {
+      if (textContent.length < 100) {
         return;
       }
 

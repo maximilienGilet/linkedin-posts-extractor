@@ -23,6 +23,16 @@ function extractPosts() {
     return temp.textContent.trim();
   }
 
+  // Helper function to extract number from string (e.g., "1,234 views" → 1234)
+  function extractNumber(text) {
+    if (!text) return 0;
+    // Remove all spaces and commas between digits
+    const cleanedText = text.replace(/(\d)[,\s](?=\d)/g, "$1");
+    // Find the first sequence of digits
+    const matches = cleanedText.match(/\d+/);
+    return matches ? parseInt(matches[0]) : 0;
+  }
+
   // Main extraction logic
   function extractPostData() {
     const posts = [];
@@ -55,9 +65,20 @@ function extractPosts() {
       const reactions = getTextContent(
         post.querySelector(".social-details-social-counts__reactions-count"),
       );
-      const comments = getTextContent(
-        post.querySelector(".social-details-social-counts__comments"),
+
+      const comments = extractNumber(
+        getTextContent(
+          post.querySelector(".social-details-social-counts__comments"),
+        ),
       );
+
+      // Extract impressions (views)
+      const impressionsElement = post.querySelector(
+        ".ca-entry-point__num-views",
+      );
+      const impressions = impressionsElement
+        ? extractNumber(impressionsElement.textContent)
+        : 0;
 
       // Extract post URL
       const postLink =
@@ -69,6 +90,7 @@ function extractPosts() {
           content: textContent,
           reactions: reactions,
           comments: comments,
+          impressions: impressions,
           url: postLink,
           timestamp: new Date().toISOString(), // Adding timestamp for when the post was extracted
         });

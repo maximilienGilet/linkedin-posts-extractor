@@ -62,8 +62,10 @@ function extractPosts() {
       }
 
       // Extract engagement metrics
-      const reactions = getTextContent(
-        post.querySelector(".social-details-social-counts__reactions-count"),
+      const reactions = extractNumber(
+        getTextContent(
+          post.querySelector(".social-details-social-counts__reactions-count"),
+        ),
       );
 
       const comments = extractNumber(
@@ -80,10 +82,6 @@ function extractPosts() {
         ? extractNumber(impressionsElement.textContent)
         : 0;
 
-      // Extract post URL
-      const postLink =
-        post.querySelector(".feed-shared-text")?.closest("a")?.href || "";
-
       // Only add if there's actual content
       if (textContent) {
         posts.push({
@@ -91,8 +89,6 @@ function extractPosts() {
           reactions: reactions,
           comments: comments,
           impressions: impressions,
-          url: postLink,
-          timestamp: new Date().toISOString(), // Adding timestamp for when the post was extracted
         });
       }
     });

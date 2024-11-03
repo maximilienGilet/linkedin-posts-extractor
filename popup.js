@@ -1,7 +1,26 @@
 function extractPosts() {
   // Helper function to get text content and handle null
   function getTextContent(element) {
-    return element ? element.textContent.trim() : "";
+    if (!element) return "";
+
+    // Convert <br> tags to newline characters
+    const html = element.innerHTML;
+    const withLineBreaks = html.replace(/<br\s*\/?>/gi, "\n");
+
+    // Create a temporary div to handle the HTML to text conversion
+    const temp = document.createElement("div");
+    temp.innerHTML = withLineBreaks;
+
+    // Get text content while preserving line breaks
+    const paragraphs = temp.querySelectorAll("p, span, div");
+    if (paragraphs.length > 0) {
+      return Array.from(paragraphs)
+        .map((p) => p.textContent.trim())
+        .filter((text) => text) // Remove empty lines
+        .join("\n");
+    }
+
+    return temp.textContent.trim();
   }
 
   // Main extraction logic
@@ -22,7 +41,7 @@ function extractPosts() {
         return;
       }
 
-      // Extract post text
+      // Extract post text with preserved line breaks
       const textContent = getTextContent(
         post.querySelector(".tvm-parent-container"),
       );

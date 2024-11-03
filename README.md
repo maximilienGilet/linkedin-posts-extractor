@@ -11,10 +11,11 @@ This is a Chrome extension that extracts posts from your LinkedIn feed and saves
 
 ## Usage
 
-1. Open your LinkedIn feed.
-2. Click the extension icon in the top right corner.
-3. Wait for the script to finish extracting your posts.
-4. The extracted posts will be saved as a JSON file in your downloads folder.
+1. Open your LinkedIn profile.
+2. Scroll down to load the posts you want to extract.
+3. Click the extension icon in the top right corner.
+4. Wait for the script to finish extracting your posts.
+5. The extracted posts will be saved as a JSON file in your downloads folder.
 
 ## Extracted Data
 

@@ -1,4 +1,4 @@
-function extractPosts() {
+function extractPosts(minImpressions = 0) {
   // Helper function to get text content and handle null
   function getTextContent(element) {
     if (!element) return "";
@@ -82,13 +82,20 @@ function extractPosts() {
         ? extractNumber(impressionsElement.textContent)
         : 0;
 
-      // Only add if there's actual content
-      if (textContent) {
+      // Extract post URN and construct URL
+      const postUrn = post.getAttribute("data-urn");
+      const postUrl = postUrn
+        ? `https://www.linkedin.com/feed/update/${postUrn}`
+        : "";
+
+      // Only add if there's actual content and meets minimum impressions
+      if (textContent && impressions >= minImpressions) {
         posts.push({
           content: textContent,
           reactions: reactions,
           comments: comments,
           impressions: impressions,
+          url: postUrl,
         });
       }
     });
@@ -118,11 +125,14 @@ function extractPosts() {
 
 document.getElementById("extractPosts").addEventListener("click", async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  const minImpressions =
+    parseInt(document.getElementById("minImpressions").value) || 0;
 
-  console.log("extracting posts...");
+  console.log("extracting posts with minimum impressions:", minImpressions);
 
   chrome.scripting.executeScript({
     target: { tabId: tab.id },
     function: extractPosts,
+    args: [minImpressions],
   });
 });

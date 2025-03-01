@@ -23,6 +23,76 @@ function extractPosts(minImpressions = 0) {
     return temp.textContent.trim();
   }
 
+  // Helper function to create custom date formats
+  function formatDate(date, formatString) {
+    if (!(date instanceof Date)) {
+      return "Invalid Date"; // Or handle the error as you see fit
+    }
+  
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    const milliseconds = String(date.getMilliseconds()).padStart(3, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const hours12 = String(hours % 12 || 12).padStart(2, '0'); // 12-hour format
+  
+    const replacements = {
+      YYYY: year,
+      YY: String(year).slice(-2),
+      MM: month,
+      M: String(parseInt(month)), // month without leading zero
+      DD: day,
+      D: String(parseInt(day)), // day without leading zero
+      HH: hours,
+      H: String(parseInt(hours)), // hours without leading zero
+      hh: hours12,
+      h: String(parseInt(hours12)), // hours without leading zero
+      mm: minutes,
+      m: String(parseInt(minutes)), // minutes without leading zero
+      ss: seconds,
+      s: String(parseInt(seconds)), // seconds without leading zero
+      SSS: milliseconds,
+      A: ampm,
+      a: ampm.toLowerCase(),
+    };
+
+    let formattedString = formatString;
+    for (const [key, value] of Object.entries(replacements)) {
+      formattedString = formattedString.replace(new RegExp(key, 'g'), value);
+    }
+
+    return formattedString;
+  }
+
+  // Helper function to get Unix Timestamp from post ID
+  function getUnixTimestamp(postId) {
+    if(postId == null) {
+      return "";
+    }
+    const binString = BigInt(postId).toString(2);
+    const trimmedChars = binString.slice(0, 41);
+    const timestamp = parseInt(trimmedChars, 2);
+    return timestamp; 
+  }
+
+  // Helper function to extract date
+  function extractPostDate(postUrn) {
+    const regex = /urn:li:activity:(\d+)/;
+    const match = regex.exec(postUrn);
+    if (match) {
+      const postId = match[1];
+      const unixTimestamp = getUnixTimestamp(postId);
+      const date = new Date(unixTimestamp);
+      return formatDate(date, "YYYY-MM-DD hh:mm:ss A");
+    }
+    else {
+      return postUrn;
+    }
+  }
+
   // Helper function to extract number from string (e.g., "1,234 views" → 1234)
   function extractNumber(text) {
     if (!text) return 0;
@@ -61,6 +131,8 @@ function extractPosts(minImpressions = 0) {
         return;
       }
 
+
+
       // Extract engagement metrics
       const reactions = extractNumber(
         getTextContent(
@@ -88,9 +160,13 @@ function extractPosts(minImpressions = 0) {
         ? `https://www.linkedin.com/feed/update/${postUrn}`
         : "";
 
+      // extract date
+      const postDate = extractPostDate(postUrn);
+      
       // Only add if there's actual content and meets minimum impressions
       if (textContent && impressions >= minImpressions) {
         posts.push({
+          post_date: postDate,
           content: textContent,
           reactions: reactions,
           comments: comments,

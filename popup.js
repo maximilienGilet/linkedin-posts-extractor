@@ -131,8 +131,6 @@ function extractPosts(minImpressions = 0) {
         return;
       }
 
-
-
       // Extract engagement metrics
       const reactions = extractNumber(
         getTextContent(
@@ -160,13 +158,13 @@ function extractPosts(minImpressions = 0) {
         ? `https://www.linkedin.com/feed/update/${postUrn}`
         : "";
 
-      // extract date
+      // extract post date
       const postDate = extractPostDate(postUrn);
       
       // Only add if there's actual content and meets minimum impressions
       if (textContent && impressions >= minImpressions) {
         posts.push({
-          post_date: postDate,
+          date_posted: postDate,
           content: textContent,
           reactions: reactions,
           comments: comments,

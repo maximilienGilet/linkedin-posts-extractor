@@ -21,6 +21,7 @@ This is a Chrome extension that extracts posts from your LinkedIn feed and saves
 
 The extracted data includes the following fields:
 
+- `date_posted`: The date and time when the post was posted.
 - `content`: The text content of the post.
 - `reactions`: The number of reactions to the post.
 - `comments`: The number of comments on the post.
